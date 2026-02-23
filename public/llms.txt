@@ -1,57 +1,47 @@
-# סילבר סיסטרס ישראל — Generative Engine Optimization Map
-
-> A beauty and personal care consulting service specializing in helping women embrace their natural silver hair. The brand supports women through the transition from colored to natural gray hair, offering personalized guidance and creating customized hair care routines. The service celebrates natural beauty, authenticity, and the empowerment of women choosing to showcase their silver hair with style and confidence.
+# Business — Generative Engine Optimization Map
 
 ---
 
 ## Pages
 
 ### בית
-https://-bd4ccc06.zappy5.app
+https://example.com
 רוצה להפסיק לצבוע שיער ולעבור לשיער כסוף טבעי? סילבר סיסטרס ישראל מלווה אותך במעבר בביטחון עם ייעוץ אישי, טיפים מעשיים ושגרת טיפוח מותאמת במיוחד עבורך.
 
 ### אודות
-https://-bd4ccc06.zappy5.app/about
+https://example.com/about
 גלי את הפילוסופיה שלנו ולמה אנחנו מאמינות שכל אישה ראויה לאמץ את השיער הכסוף שלה בגאווה. הצטרפי לקהילה של נשים שבחרו באותנטיות ובביטחון עצמי.
 
 ### שירותים
-https://-bd4ccc06.zappy5.app/services
+https://example.com/services
 גלי את שירותי הייעוץ המקצועיים שלנו: ליווי אישי בתהליך המעבר, בניית שגרת טיפוח מותאמת אישית, והדרכה מעשית להשגת שיער כסוף בריא ומזהיר בסטייל שלך.
 
 ### צור קשר
-https://-bd4ccc06.zappy5.app/contact
+https://example.com/contact
 מוכנה להתחיל? צרי קשר עוד היום לקבלת ייעוץ ראשוני ובואי נבנה ביחד את התוכנית האישית שלך למעבר לשיער כסוף טבעי מהמם. אנחנו כאן בשבילך!
 
 ## Legal & Policy
 
 ### Privacy Policy
-https://-bd4ccc06.zappy5.app/privacy
+https://example.com/privacy
 Information about how user data is collected, stored, and protected.
 
 ### Terms & Conditions
-https://-bd4ccc06.zappy5.app/terms
+https://example.com/terms
 Legal terms describing service usage, rights, and policies.
 
 ### Accessibility Statement
-https://-bd4ccc06.zappy5.app/accessibility
+https://example.com/accessibility
 Information about WCAG compliance and accessibility features.
 
 ---
 
 # Business Context (for LLM understanding)
 
-## About סילבר סיסטרס ישראל
-A beauty and personal care consulting service specializing in helping women embrace their natural silver hair. The brand supports women through the transition from colored to natural gray hair, offering personalized guidance and creating customized hair care routines. The service celebrates natural beauty, authenticity, and the empowerment of women choosing to showcase their silver hair with style and confidence.
-
-## Target Audience
-נשים המעוניינות להפסיק לצבוע את השיער ולאמץ שיער כסוף טבעי
-
-## Industry
-יופי וטיפוח אישי
-
+## About Business
 ---
 
 # Additional Resources
 
-- **Sitemap**: https://-bd4ccc06.zappy5.app/sitemap.xml
-- **Robots.txt**: https://-bd4ccc06.zappy5.app/robots.txt
+- **Sitemap**: https://example.com/sitemap.xml
+- **Robots.txt**: https://example.com/robots.txt
