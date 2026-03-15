@@ -585,8 +585,31 @@ window.onload = function() {
       } catch (e) {}
     }
 
+    function ensureLightboxCss(){
+      try {
+        var head = document.head || document.querySelector('head');
+        if (!head || head.querySelector('style[data-zappy-image-lightbox="true"]')) return;
+        var s = document.createElement('style');
+        s.setAttribute('data-zappy-image-lightbox','true');
+        s.textContent =
+          '.zappy-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:24px;}'+
+          '.zappy-lightbox-content{position:relative;max-width:min(1100px,92vw);max-height:92vh;}'+
+          '.zappy-lightbox-content img{max-width:92vw;max-height:92vh;display:block;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.45);}'+
+          '.zappy-lightbox-close{position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:999px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;}'+
+          '.zappy-lightbox-backdrop{position:absolute;inset:0;display:block;cursor:pointer;}'+
+          'input.zappy-lightbox-toggle{position:absolute;opacity:0;pointer-events:none;}'+
+          'label.zappy-lightbox-trigger{display:contents;}'+
+          'label.zappy-lightbox-trigger{cursor:zoom-in;}'+
+          'label.zappy-lightbox-trigger [data-zappy-zoom-wrapper="true"],'+
+          'label.zappy-lightbox-trigger img{cursor:zoom-in !important;}'+
+          'input.zappy-lightbox-toggle:checked + label.zappy-lightbox-trigger + .zappy-lightbox{display:flex;}';
+        head.appendChild(s);
+      } catch(e){}
+    }
+
     function initZappyPublishedLightboxes(){
       try {
+        ensureLightboxCss();
         // Repair orphaned labels (label has for=toggleId but input is missing)
         var orphanLabels = document.querySelectorAll('label.zappy-lightbox-trigger[for^="zappy-lightbox-toggle-"]');
         for (var i=0;i<orphanLabels.length;i++){
@@ -725,6 +748,23 @@ window.onload = function() {
       img.style.setProperty('margin', '0', 'important');
     }
 
+    function fixOrphanedZoomImages() {
+      if (window.innerWidth > 768) return;
+      var zoomImgs = document.querySelectorAll('img[data-zappy-zoom]');
+      for (var j = 0; j < zoomImgs.length; j++) {
+        var img = zoomImgs[j];
+        if (img.closest && img.closest('[data-zappy-zoom-wrapper="true"]')) continue;
+        img.style.setProperty('position', 'relative', 'important');
+        img.style.setProperty('width', '100%', 'important');
+        img.style.setProperty('height', 'auto', 'important');
+        img.style.setProperty('max-width', '100%', 'important');
+        img.style.setProperty('max-height', '300px', 'important');
+        img.style.setProperty('object-fit', 'cover', 'important');
+        img.style.removeProperty('left');
+        img.style.removeProperty('top');
+      }
+    }
+
     function initZoomWrappers() {
       var wrappers = document.querySelectorAll('[data-zappy-zoom-wrapper="true"]');
       for (var i = 0; i < wrappers.length; i++) {
@@ -742,6 +782,7 @@ window.onload = function() {
           }
         })(wrappers[i]);
       }
+      fixOrphanedZoomImages();
     }
 
     if (document.readyState === 'loading') {
@@ -832,10 +873,44 @@ window.onload = function() {
       });
     }
 
+    function initPhoneButton() {
+      var phoneBtn = document.querySelector('.phone-header-btn');
+      if (!phoneBtn || phoneBtn.__zappyPhoneBound) return;
+      phoneBtn.__zappyPhoneBound = true;
+
+      phoneBtn.addEventListener('click', function() {
+        var phoneNumber = phoneBtn.getAttribute('data-phone') || null;
+
+        if (!phoneNumber) {
+          var telLinks = document.querySelectorAll('a[href^="tel:"]');
+          if (telLinks.length > 0) {
+            phoneNumber = telLinks[0].getAttribute('href').replace('tel:', '');
+          }
+        }
+
+        if (!phoneNumber) {
+          var allLinks = document.querySelectorAll('a[href]');
+          for (var i = 0; i < allLinks.length; i++) {
+            var h = allLinks[i].getAttribute('href') || '';
+            var cleaned = h.replace(/[-\s()]/g, '');
+            if (/^(\+?\d{9,15}|0\d{8,9})$/.test(cleaned)) {
+              phoneNumber = cleaned;
+              break;
+            }
+          }
+        }
+
+        if (phoneNumber && phoneNumber.indexOf('[') === -1) {
+          window.location.href = 'tel:' + phoneNumber;
+        }
+      });
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initMobileToggle, { once: true });
+      document.addEventListener('DOMContentLoaded', function() { initMobileToggle(); initPhoneButton(); }, { once: true });
     } else {
       initMobileToggle();
+      initPhoneButton();
     }
   } catch (e) {}
 })();
@@ -892,6 +967,176 @@ window.onload = function() {
   } catch (e) {}
 })();
 /* END ZAPPY_FAQ_ACCORDION_TOGGLE */
+
+
+/* ZAPPY_CONTACT_FORM_PREVENT_DEFAULT */
+(function(){
+  try {
+    var _kw=['contact','booking','inquiry','enquiry','register','signup','sign-up','order','request','apply'];
+    function isContactForm(form) {
+      var cls=(form.className||'').toLowerCase();
+      var id=(form.id||'').toLowerCase();
+      var act=(form.getAttribute('action')||'').toLowerCase();
+      if(_kw.some(function(k){return cls.indexOf(k)!==-1||id.indexOf(k)!==-1||act.indexOf(k)!==-1;})) return true;
+      var sec=form.closest&&form.closest('section');
+      if(sec){
+        var sc=(sec.className||'').toLowerCase();
+        var si=(sec.id||'').toLowerCase();
+        if(_kw.some(function(k){return sc.indexOf(k)!==-1||si.indexOf(k)!==-1;})) return true;
+        if(sc.indexOf('form-section')!==-1||sc.indexOf('form_section')!==-1) return true;
+      }
+      if(window.zappyContactFormLoaded){
+        var inputs=form.querySelectorAll('input,textarea,select');
+        var hasEmail=false,hasPassword=false,visibleCount=0;
+        for(var i=0;i<inputs.length;i++){
+          var inp=inputs[i];
+          var t=(inp.type||'').toLowerCase();
+          var n=(inp.name||'').toLowerCase();
+          if(t==='hidden'||t==='submit'||t==='button'||t==='reset') continue;
+          visibleCount++;
+          if(t==='email'||n.indexOf('email')!==-1||n.indexOf('mail')!==-1) hasEmail=true;
+          if(t==='password') hasPassword=true;
+        }
+        if(hasEmail&&visibleCount>=2&&!hasPassword) return true;
+      }
+      return false;
+    }
+
+    function showFormFeedback(form, msg, type) {
+      var old = form.querySelector('.zappy-form-feedback');
+      if (old) old.remove();
+
+      var bg = type==='success'?'#d4edda':type==='error'?'#f8d7da':'#d1ecf1';
+      var fg = type==='success'?'#155724':type==='error'?'#721c24':'#0c5460';
+      var bd = type==='success'?'#c3e6cb':type==='error'?'#f5c6cb':'#bee5eb';
+      var ic = type==='success'?'\u2705':type==='error'?'\u274C':'\u2139\uFE0F';
+
+      var el = document.createElement('div');
+      el.className = 'zappy-form-feedback';
+      el.setAttribute('role', 'alert');
+      el.style.cssText = 'padding:14px 18px;border-radius:8px;margin:12px 0 0;font-size:14px;line-height:1.5;background:'+bg+';color:'+fg+';border:1px solid '+bd+';text-align:center;font-family:inherit;';
+      el.innerHTML = '<span style="margin-inline-end:6px">'+ic+'</span>'+msg;
+
+      if (type === 'success') {
+        form.reset();
+        var formChildren = form.children;
+        for (var i = 0; i < formChildren.length; i++) {
+          if (formChildren[i] !== el) formChildren[i].style.display = 'none';
+        }
+        form.appendChild(el);
+        el.style.cssText += 'padding:32px 24px;font-size:16px;';
+      } else {
+        var btn = form.querySelector('button[type="submit"],input[type="submit"]');
+        if (btn) btn.parentNode.insertBefore(el, btn.nextSibling);
+        else form.appendChild(el);
+        setTimeout(function(){ if(el.parentElement) el.remove(); }, 8000);
+      }
+    }
+
+    var _coreNameFields=['name','firstName','first_name','fname','lastName','last_name','lname'];
+    var _coreEmailFields=['email','emailAddress','mail','e-mail'];
+    var _corePhoneFields=['phone','tel','telephone','mobile','cellphone'];
+    var _coreMsgFields=['message','msg','comments','comment','description','details','notes','body','text','inquiry'];
+    var _coreSubjectFields=['subject','topic','regarding','re'];
+    var _allCoreFields=[].concat(_coreNameFields,_coreEmailFields,_corePhoneFields,_coreMsgFields,_coreSubjectFields);
+
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      if (!form || form.tagName !== 'FORM' || !isContactForm(form)) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      var origSubmit = form.submit;
+      form.submit = function(){ };
+
+      if (form.__zappySubmitting) return;
+      form.__zappySubmitting = true;
+
+      var oldFeedback = form.querySelector('.zappy-form-feedback');
+      if (oldFeedback) oldFeedback.remove();
+
+      var btn = form.querySelector('button[type="submit"],input[type="submit"]');
+      var origText = btn ? (btn.value || btn.textContent) : '';
+      if (btn) {
+        if (btn.tagName === 'INPUT') btn.value = 'Sending...';
+        else btn.textContent = 'Sending...';
+        btn.disabled = true;
+      }
+
+      var fd = new FormData(form);
+      var data = {};
+      for(var pair of fd.entries()){
+        if(data[pair[0]]!==undefined){
+          if(Array.isArray(data[pair[0]])) data[pair[0]].push(pair[1]);
+          else data[pair[0]]=[data[pair[0]],pair[1]];
+        } else data[pair[0]]=pair[1];
+      }
+
+      var resolvedName=(data.name||'').trim()
+        ||[data.firstName||data.first_name||data.fname||'',data.lastName||data.last_name||data.lname||''].filter(Boolean).join(' ').trim()
+        ||(data.email||data.emailAddress||data.mail||'').trim()
+        ||'Anonymous';
+      var resolvedEmail=(data.email||data.emailAddress||data.mail||data['e-mail']||'').trim();
+      var resolvedPhone=data.phone||data.tel||data.telephone||data.mobile||data.cellphone||null;
+      var resolvedSubject=data.subject||data.topic||data.regarding||data.re||'Contact Form Submission';
+      var resolvedMsg=(data.message||data.msg||data.comments||data.comment||data.description||data.details||data.notes||data.body||data.text||data.inquiry||'').trim();
+      if(!resolvedMsg){
+        var _extra=Object.entries(data).filter(function(e){return _allCoreFields.indexOf(e[0])===-1;});
+        if(_extra.length>0) resolvedMsg=_extra.map(function(e){var l=e[0].replace(/([A-Z])/g,' $1').replace(/[_-]/g,' ').trim();var v=Array.isArray(e[1])?e[1].join(', '):e[1];return l+': '+v;}).join('\n');
+        else resolvedMsg='Form submission from '+window.location.pathname;
+      }
+
+      var extraFields={};
+      Object.keys(data).forEach(function(k){if(_allCoreFields.indexOf(k)===-1&&data[k]!==''&&data[k]!=null) extraFields[k]=data[k];});
+
+      var currentPath = window.location.pathname;
+      try { var pg=new URLSearchParams(window.location.search).get('page'); if(pg) currentPath=pg; } catch(x){}
+
+      var wid = 'bd4ccc06-5f55-44dd-bd80-54834ffd4f4a';
+
+      var apiBase = (window.ZAPPY_API_BASE || 'https://api.zappy5.com').replace(/\/$/,'');
+      apiBase = apiBase + '/api/email/contact-form';
+
+      var payload={
+        websiteId: wid,
+        name: resolvedName,
+        email: resolvedEmail,
+        subject: resolvedSubject,
+        message: resolvedMsg,
+        phone: resolvedPhone,
+        currentPagePath: currentPath
+      };
+      if(Object.keys(extraFields).length>0) payload.extraFields=extraFields;
+
+      fetch(apiBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).then(function(result){
+        if (result.success) {
+          if (result.thankYouPagePath && result.ticketNumber) {
+            window.location.href = result.thankYouPagePath + '?ticket=' + encodeURIComponent(result.ticketNumber);
+            return;
+          }
+          showFormFeedback(form, result.message || 'Thank you! We will get back to you soon.', 'success');
+        } else {
+          showFormFeedback(form, result.error || 'Failed to send. Please try again.', 'error');
+        }
+      }).catch(function(){
+        showFormFeedback(form, 'Unable to send message right now. Please try again later.', 'error');
+      }).finally(function(){
+        form.__zappySubmitting = false;
+        form.submit = origSubmit;
+        if (btn) {
+          if (btn.tagName === 'INPUT') btn.value = origText;
+          else btn.textContent = origText;
+          btn.disabled = false;
+        }
+      });
+    }, true);
+  } catch (e) {}
+})();
+/* END ZAPPY_CONTACT_FORM_PREVENT_DEFAULT */
 
 
 /* ZAPPY_PUBLISHED_GRID_CENTERING */
