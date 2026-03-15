@@ -1,6 +1,4 @@
-# סילבר סיסטרס ישראל — Generative Engine Optimization Map
-
-> A beauty and personal care consulting service specializing in helping women embrace their natural silver hair. The brand supports women through the transition from colored to natural gray hair, offering personalized guidance and creating customized hair care routines. The service celebrates natural beauty, authenticity, and the empowerment of women choosing to showcase their silver hair with style and confidence.
+# Business — Generative Engine Optimization Map
 
 ---
 
@@ -40,15 +38,7 @@ Information about WCAG compliance and accessibility features.
 
 # Business Context (for LLM understanding)
 
-## About סילבר סיסטרס ישראל
-A beauty and personal care consulting service specializing in helping women embrace their natural silver hair. The brand supports women through the transition from colored to natural gray hair, offering personalized guidance and creating customized hair care routines. The service celebrates natural beauty, authenticity, and the empowerment of women choosing to showcase their silver hair with style and confidence.
-
-## Target Audience
-נשים המעוניינות להפסיק לצבוע את השיער ולאמץ שיער כסוף טבעי
-
-## Industry
-יופי וטיפוח אישי
-
+## About Business
 ---
 
 # Additional Resources
